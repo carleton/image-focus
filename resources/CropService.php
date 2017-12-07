@@ -10,9 +10,9 @@ namespace ImageFocus;
  */
 class CropService
 {
-    private $attachment = [];
-    private $imageSizes = [];
-    private $focusPoint = ['x' => 50, 'y' => 50];
+    protected $attachment = [];
+    protected $imageSizes = [];
+    protected $focusPoint = ['x' => 50, 'y' => 50];
 
     /**
      * Crop the image on base of the focus point
@@ -34,7 +34,7 @@ class CropService
      * @param $attachmentId
      * @param $focusPoint
      */
-    private function setCropData($attachmentId, $focusPoint)
+    protected function setCropData($attachmentId, $focusPoint)
     {
         $this->getImageSizes();
         $this->getAttachment($attachmentId);
@@ -80,7 +80,7 @@ class CropService
      * @param $attachmentId
      * @return $this
      */
-    private function getAttachment($attachmentId)
+    protected function getAttachment($attachmentId)
     {
         $attachment = wp_get_attachment_image_src($attachmentId, 'full');
 
@@ -101,7 +101,7 @@ class CropService
      * @param $focusPoint
      * @return $this
      */
-    private function setFocusPoint($focusPoint)
+    protected function setFocusPoint($focusPoint)
     {
         if ($focusPoint) {
             $this->focusPoint = $focusPoint;
@@ -113,7 +113,7 @@ class CropService
     /**
      * Put the focuspoint in the post meta of the attachment post
      */
-    private function saveFocusPointToDB()
+    protected function saveFocusPointToDB()
     {
         update_post_meta($this->attachment['id'], 'focus_point', $this->focusPoint);
     }
@@ -121,7 +121,7 @@ class CropService
     /**
      * Crop the actual attachment
      */
-    private function cropAttachment()
+    protected function cropAttachment()
     {
         // Loop trough all the image sizes connected to this attachment
         foreach ($this->imageSizes as $imageSize) {
@@ -146,7 +146,7 @@ class CropService
      * @param $imageSize
      * @return mixed
      */
-    private function getImageFilePath($imageSize)
+    protected function getImageFilePath($imageSize)
     {
         // Get the path to the WordPress upload directory
         $uploadDir = wp_upload_dir()['basedir'] . '/';
@@ -167,7 +167,7 @@ class CropService
      *
      * @param $file
      */
-    private function removeOldImage($file)
+    protected function removeOldImage($file)
     {
         if (file_exists($file)) {
             unlink($file);
@@ -181,7 +181,7 @@ class CropService
      * @param $imageFilePath
      * @return $this
      */
-    private function cropImage($imageSize, $imageFilePath)
+    protected function cropImage($imageSize, $imageFilePath)
     {
         // Gather all dimension
         $dimensions = ['x' => [], 'y' => []];

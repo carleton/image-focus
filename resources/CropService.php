@@ -36,8 +36,8 @@ class CropService
      */
     protected function setCropData($attachmentId, $focusPoint)
     {
-        $this->getImageSizes();
         $this->getAttachment($attachmentId);
+        $this->getImageSizes();
         $this->setFocusPoint($focusPoint);
         $this->saveFocusPointToDB();
     }
@@ -64,10 +64,23 @@ class CropService
         }
 
         // Get all the custom set image Sizes
-        foreach ((array)wp_get_additional_image_sizes() as $key => $imageSize) {
-            if ($imageSize['crop']) {
-                $this->imageSizes[$key] = $imageSize;
-                $this->imageSizes[$key]['ratio'] = (float)$imageSize['width'] / $imageSize['height'];
+        foreach ( (array) wp_get_additional_image_sizes() as $key => $imageSize ) {
+            if ( $imageSize['crop'] ) {
+                $this->imageSizes[ $key ] = $imageSize;
+
+                $width  = (float) $imageSize['width'];
+                $height = $imageSize['height'];
+
+                if ($height > 0) {
+                    $ratio = $width / $height;
+                } else {
+                    // if the height is zero, we need to use the original image's aspect ratio
+                    $ratio = $this->attachment['ratio'];
+                    // also save this calculated height for later use in cropImage()
+                    $this->imageSizes[$key]['undefined_height'] = $width / $ratio;
+                }
+
+                $this->imageSizes[ $key ]['ratio'] = $ratio;
             }
         }
 
@@ -224,13 +237,17 @@ class CropService
         }
 
         // Excecute the WordPress image crop function
-        wp_crop_image($this->attachment['id'],
+        $image_height = $imageSize['height'];
+        if ($image_height == 0 && (isset($imageSize['undefined_height']))) {
+            $image_height = $imageSize['undefined_height'];
+        }
+        wp_crop_image( $this->attachment['id'],
             $dimensions['x']['start'],
             $dimensions['y']['start'],
             $dimensions['x']['end'] - $dimensions['x']['start'],
             $dimensions['y']['end'] - $dimensions['y']['start'],
             $imageSize['width'],
-            $imageSize['height'],
+            $image_height,
             false,
             $imageFilePath
         );

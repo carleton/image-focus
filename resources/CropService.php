@@ -76,8 +76,8 @@ class CropService
                 } else {
                     // if the height is zero, we need to use the original image's aspect ratio
                     $ratio = $this->attachment['ratio'];
-                    // also save this calculated height for later use in cropImage()
-                    $this->imageSizes[$key]['undefined_height'] = $width / $ratio;
+                    // also calculate the height for later use
+                    $this->imageSizes[$key]['height'] = round($width / $ratio, 0);
                 }
 
                 $this->imageSizes[ $key ]['ratio'] = $ratio;
@@ -237,17 +237,13 @@ class CropService
         }
 
         // Excecute the WordPress image crop function
-        $image_height = $imageSize['height'];
-        if ($image_height == 0 && (isset($imageSize['undefined_height']))) {
-            $image_height = $imageSize['undefined_height'];
-        }
         wp_crop_image( $this->attachment['id'],
             $dimensions['x']['start'],
             $dimensions['y']['start'],
             $dimensions['x']['end'] - $dimensions['x']['start'],
             $dimensions['y']['end'] - $dimensions['y']['start'],
             $imageSize['width'],
-            $image_height,
+            $imageSize['height'],
             false,
             $imageFilePath
         );

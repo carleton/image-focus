@@ -30,6 +30,16 @@ class CropService {
 	}
 
 	/**
+	 * Save the focal point data to the DB
+	 * Skips the actual image creation to speed up importing
+	 * @param $focusPoint
+	 */
+	public function setFocusPointData( $focusPoint ) {
+		$this->setFocusPoint( $focusPoint );
+		$this->saveFocusPointToDB();
+	}
+
+	/**
 	 * Set all crop data
 	 *
 	 * @param $attachmentId

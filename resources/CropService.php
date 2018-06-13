@@ -206,6 +206,7 @@ class CropService {
 	 * @return $this
 	 */
 	protected function cropImage( $imageSize, $imageFilePath ) {
+		return $this;
 		// Gather all dimension
 		$dimensions = [ 'x' => [], 'y' => [] ];
 		$directions = [ 'x' => 'width', 'y' => 'height' ];

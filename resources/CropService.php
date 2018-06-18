@@ -144,7 +144,13 @@ class CropService {
 	 * Crop the actual attachment
 	 */
 	protected function cropAttachment() {
+
 		$image_meta = get_post_meta( $this->attachment['id'], '_wp_attachment_metadata', true );
+
+		$info = pathinfo( $image_meta['file'] );
+		$ext  = $info['extension'];
+		$name = wp_basename( $image_meta['file'], ".$ext" );
+
 
 		foreach ( $this->imageSizes as $size_name => $imageSize ) {
 			$meta = tribe_project()->container()[ 'tachyon.meta' ];
@@ -161,7 +167,7 @@ class CropService {
 				$this->focusPoint
 			);
 
-			$image_meta['sizes'][$size_name]['file'] = $new_size;
+			$image_meta['sizes'][$size_name]['file'] = "{$name}.{$ext}?{$new_size}";
 		}
 
 		update_post_meta( $this->attachment['id'], '_wp_attachment_metadata', $image_meta );

@@ -144,24 +144,27 @@ class CropService {
 	 * Crop the actual attachment
 	 */
 	protected function cropAttachment() {
-		// Loop trough all the image sizes connected to this attachment
-		foreach ( $this->imageSizes as $imageSize ) {
+		$image_meta = get_post_meta( $this->attachment['id'], '_wp_attachment_metadata', true );
 
-			// apply image_resize_dimensions filter
+		foreach ( $this->imageSizes as $size_name => $imageSize ) {
+			$meta = tribe_project()->container()[ 'tachyon.meta' ];
 
-			// Stop this iteration if the attachment is too small to be cropped for this image size
-//			if ( $imageSize['width'] > $this->attachment['width'] || $imageSize['height'] > $this->attachment['height'] ) {
-//				continue;
-//			}
-			// Don't preempt - allow cropImage() to upscale "too small" image
+			$new_size = $meta->dimension_params(
+				[
+					$this->attachment['width'],
+					$this->attachment['height'],
+				],
+				[
+					$imageSize['width'],
+					$imageSize['height'],
+				],
+				$this->focusPoint
+			);
 
-			// Get the file path of the attachment and the delete the old image
-			$imageFilePath = $this->getImageFilePath( $imageSize );
-			$this->removeOldImage( $imageFilePath );
-
-			// Now execute the actual image crop
-			$this->cropImage( $imageSize, $imageFilePath );
+			$image_meta['sizes'][$size_name]['file'] = $new_size;
 		}
+
+		wp_update_attachment_metadata( $this->attachment['id'], '_wp_attachment_metadata' );
 	}
 
 	/**

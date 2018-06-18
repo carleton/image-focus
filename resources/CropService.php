@@ -164,7 +164,9 @@ class CropService {
 			$image_meta['sizes'][$size_name]['file'] = $new_size;
 		}
 
-		wp_update_attachment_metadata( $this->attachment['id'], '_wp_attachment_metadata' );
+		update_post_meta( $this->attachment['id'], '_wp_attachment_metadata', $image_meta );
+
+		return $this;
 	}
 
 	/**

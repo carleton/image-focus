@@ -164,7 +164,10 @@ class CropService {
 					$imageSize['width'],
 					$imageSize['height'],
 				],
-				$this->focusPoint
+				[
+					$this->focusPoint['x'],
+					$this->focusPoint['y'],
+				]
 			);
 
 			$image_meta['sizes'][$size_name]['file'] = "{$name}.{$ext}?{$new_size}";
